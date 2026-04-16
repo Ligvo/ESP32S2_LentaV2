@@ -17,6 +17,7 @@
 const uint8_t NumbLedsInBlock = (LED_COUNT / NUMBCOLORBLOCKS); // Количество LED в блоке
 const uint8_t PolBloka = (LED_COUNT / NUMBCOLORBLOCKS) / 2;
 const uint8_t PolBlokaAllLed = LED_COUNT / 2;
+const uint8_t LedCount  = LED_COUNT;
 
 void CheckPinsTask(void *pvParameters);
 
@@ -42,7 +43,7 @@ TimerHandle_t CheckParametersTimer;               // Таймер проверк
 //TimerHandle_t CheckPinsTimer;                     // таймер проверки нажатия кнопок
 
 //NeoPixelBus<NeoGrbFeature, NeoEsp32I2s0Ws2812xMethod> leds(LED_COUNT, LED_PIN);
-MeopixelArray<NeoGrbFeature, NeoEsp32I2s0Ws2812xMethod> leds(LED_COUNT, LED_PIN);
+NeoPixelArray<NeoGrbFeature, NeoEsp32I2s0Ws2812xMethod> leds(LED_COUNT, LED_PIN);
 //SettingsManager settings; //- определе как глобальная переменная
 
 
@@ -555,13 +556,13 @@ void CheckPinsTask(void *pvParameters) {
     uint8_t pin_autoswon = digitalRead(KEY_PIN_AUT_SW_ON);
 
     if(pin_autoswon == 0) 
-      AutoSwOn = true;
+      engine.SetAutoSw(true);
     else 
-      AutoSwOn = false;
+      engine.SetAutoSw(false);
 
     //Serial.println(pin_autoswon);
-    if(_lastas != AutoSwOn){
-      if(AutoSwOn)
+    if(_lastas != engine.GetAutoSw()){
+      if(engine.GetAutoSw())
       {
         needSendParam = true; // СИГНАЛ: нужно отправить отчет по сети
         PrintDebugInfo("AutoSw On");
@@ -572,7 +573,7 @@ void CheckPinsTask(void *pvParameters) {
         PrintDebugInfo("AutoSw Off");
       }
 
-      _lastas = AutoSwOn;
+      _lastas = engine.GetAutoSw();
     }
 
    uint8_t pin_brightness = map(analogRead(PIN_BRIGHTNESS),0,2047,32,255);
@@ -653,11 +654,11 @@ void CheckPins()
 
   uint8_t pin_autoswon = digitalRead(KEY_PIN_AUT_SW_ON);
   
-  if(pin_autoswon == 0) AutoSwOn = true;
-  else AutoSwOn = false;
+  if(pin_autoswon == 0) engine.SetAutoSw(true);
+  else engine.SetAutoSw(false);
   //Serial.println(pin_autoswon);
-  if(_lastas != AutoSwOn){
-    if(AutoSwOn)
+  if(_lastas != engine.GetAutoSw()){
+    if(engine.GetAutoSw())
     {
       needSendParam = true; // СИГНАЛ: нужно отправить отчет по сети
       PrintDebugInfo("AutoSw On");
@@ -668,7 +669,7 @@ void CheckPins()
       PrintDebugInfo("AutoSw Off");
     }
 
-    _lastas = AutoSwOn;
+    _lastas = engine.GetAutoSw();
   }
 
    uint8_t pin_brightness = map(analogRead(PIN_BRIGHTNESS),0,2047,32,255);
